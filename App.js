@@ -7,6 +7,8 @@ require('firebase/firestore');
 
 firebase.initializeApp(firebaseConfig);
 
+const db = firebase.firestore();
+
 firebase
   .auth()
   .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
@@ -15,5 +17,5 @@ firebase
   });
 
 export default function App() {
-  return <Navigator />;
+  return <Navigator db={db} />;
 }

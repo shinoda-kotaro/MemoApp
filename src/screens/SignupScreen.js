@@ -1,20 +1,46 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import firebase from 'firebase';
 import AuthForm from '../components/AuthForm';
 
-export default function SignupScreen({ navigation }) {
-  firebase.auth().onAuthStateChanged(function (user) {
-    if (user) {
-      navigation.navigate('App');
-    }
-  });
+// firebase.initializeApp(firebaseConfig);
+
+export default function SignupScreen({ route, navigation }) {
+  const db = route.params.db;
+
+  useEffect(() => {
+    firebase.auth().onAuthStateChanged(function (user) {
+      if (user) {
+        navigation.navigate('App');
+      }
+    });
+  }, []);
+
   const Signup = (email, password) => {
     firebase
       .auth()
       .createUserWithEmailAndPassword(email, password)
-      .then(() => {
-        console.log('success');
-        navigation.navigate('App');
+      .then((user) => {
+        user
+          .updateProfile({
+            displayName: 'User',
+          })
+          .then(() => {
+            db.collection('users')
+              .add({
+                name: 'user',
+                email: email,
+              })
+              .then(() => {
+                console.log('success!');
+                navigation.navigate('App');
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       })
       .catch((error) => {
         console.log(error);
